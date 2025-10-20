@@ -154,7 +154,7 @@ export default function GenerarPage() {
   const getFullShortUrl = () => {
     if (!generatedQR) return '';
     // Use the actual ID from the database, which is now a UUID
-    return `tuqr.com.mx/dynamiqr/${generatedQR.id}`;
+    return `tuqr.com.mx/qr/index.php?id=${generatedQR.id}`;
   };
 
   useEffect(() => {
