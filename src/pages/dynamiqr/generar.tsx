@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import QRCodeStyling, { DotType } from 'qr-code-styling';
 import jsPDF from 'jspdf';
 import { QRCode as QRCodeType, Folder } from '@/types';
 
@@ -119,6 +118,14 @@ const ShortUrl = styled.p`
 
 // --- React Component ---
 export default function GenerarPage() {
+  const [QRCodeStylingModule, setQRCodeStylingModule] = useState<any>(null);
+
+  useEffect(() => {
+    import('qr-code-styling').then((mod) => {
+      setQRCodeStylingModule(() => mod.default);
+    });
+  }, []);
+
   // Descargar SVG vectorial
   const handleDownloadSvg = async () => {
     if (!qrCodeInstanceRef.current) return;
@@ -137,7 +144,7 @@ export default function GenerarPage() {
   const [destinationUrl, setDestinationUrl] = useState('');
   // QR siempre negro y redondeado
   const qrColor = '#000000';
-  const dotStyle: DotType = 'extra-rounded';
+  const dotStyle = 'extra-rounded';
   const [generatedQR, setGeneratedQR] = useState<QRCodeType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -145,7 +152,7 @@ export default function GenerarPage() {
   const [selectedFolder, setSelectedFolder] = useState('');
 
   const qrRef = useRef<HTMLDivElement>(null);
-  const qrCodeInstanceRef = useRef<QRCodeStyling | null>(null);
+  const qrCodeInstanceRef = useRef<any>(null);
 
   useEffect(() => {
     fetch('/api/folders').then(res => res.json()).then(setFolders);
@@ -158,9 +165,10 @@ export default function GenerarPage() {
   };
 
   useEffect(() => {
+    if (!QRCodeStylingModule) return;
     if (generatedQR && qrRef.current) {
       qrRef.current.innerHTML = '';
-      qrCodeInstanceRef.current = new QRCodeStyling({
+      qrCodeInstanceRef.current = new QRCodeStylingModule({
         width: 256,
         height: 256,
         data: getFullShortUrl(),
@@ -173,7 +181,7 @@ export default function GenerarPage() {
       });
       qrCodeInstanceRef.current.append(qrRef.current);
     }
-  }, [generatedQR]);
+  }, [generatedQR, QRCodeStylingModule]);
 
   const handleDownloadPdf = async () => {
     if (!qrCodeInstanceRef.current) return;
@@ -232,6 +240,8 @@ export default function GenerarPage() {
       setIsLoading(false);
     }
   };
+
+  if (!QRCodeStylingModule) return null;
 
   return (
     <PageWrapper>

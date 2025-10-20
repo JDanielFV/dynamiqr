@@ -151,7 +151,7 @@ function QRCodeRow({ qr, folders, onUpdate }: { qr: QRCode; folders: Folder[]; o
     const qrCodeInstance = new QRCodeStyling({
       width: 256,
       height: 256,
-      data: `tuqr.com.mx/dynamiqr/${qr.id}`,
+      data: `tuqr.com.mx/qr/index.php?id=${qr.id}`,
       dotsOptions: { color: '#000000', type: 'extra-rounded' },
       backgroundOptions: { color: '#FFFFFF' },
     });
@@ -174,7 +174,7 @@ function QRCodeRow({ qr, folders, onUpdate }: { qr: QRCode; folders: Folder[]; o
     const qrCodeInstance = new QRCodeStyling({
       width: 256,
       height: 256,
-      data: `tuqr.com.mx/dynamiqr/${qr.id}`,
+      data: `tuqr.com.mx/qr/index.php?id=${qr.id}`,
       dotsOptions: { color: '#000000', type: 'extra-rounded' },
       backgroundOptions: { color: '#1E1E1E' },
     });
@@ -230,7 +230,7 @@ function QRCodeRow({ qr, folders, onUpdate }: { qr: QRCode; folders: Folder[]; o
                 ))}
             </Select>
         </InputGroup>
-      <ShortUrl>URL corta: tuqr.com.mx/dynamiqr/{qr.id}</ShortUrl>
+      <ShortUrl>URL corta: tuqr.com.mx/qr/index.php?id={qr.id}</ShortUrl>
       <ButtonGroup>
         <SaveButton onClick={handleSave}>Guardar</SaveButton>
         <DeleteButton onClick={handleDelete}>Eliminar</DeleteButton>
