@@ -1,17 +1,5 @@
 import { GetServerSideProps } from 'next';
-import path from 'path';
-import { promises as fs } from 'fs';
-
-// We can reuse the types, but for self-containment, we define them here.
-interface QRCode {
-  id: string;
-  destinationUrl: string;
-  createdAt: string;
-}
-
-interface Database {
-  qrcodes: Record<string, QRCode>;
-}
+import { supabase } from '@/lib/supabaseClient';
 
 // This page will almost never be rendered. 
 // Its sole purpose is to run server-side logic and redirect.
@@ -27,27 +15,31 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   try {
-    const dbPath = path.resolve(process.cwd(), 'db.json');
-    const fileContent = await fs.readFile(dbPath, 'utf-8');
-    const db = JSON.parse(fileContent) as Database;
+    const { data, error } = await supabase
+      .from('qrcodes')
+      .select('destination_url')
+      .eq('id', id)
+      .single();
 
-    const qrCode = db.qrcodes[id];
+    if (error || !data) {
+      console.error('Error fetching QR code for redirect:', error?.message);
+      return { notFound: true };
+    }
 
-    if (qrCode && qrCode.destinationUrl) {
+    if (data.destination_url) {
       // If the QR code is found, issue a redirect.
       return {
         redirect: {
-          destination: qrCode.destinationUrl,
+          destination: data.destination_url,
           permanent: false, // Use 307 Temporary Redirect
         },
       };
     } else {
-      // If the QR code is not found, show a 404 page.
+      // If the destination URL is empty, show a 404.
       return { notFound: true };
     }
-  } catch (error) {
-    console.error('Error reading database for redirect:', error);
-    // If there's any error (e.g., db.json not found), show a 404.
+  } catch (error: any) {
+    console.error('Error in redirect logic:', error.message);
     return { notFound: true };
   }
 };

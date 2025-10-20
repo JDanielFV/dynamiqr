@@ -1,19 +1,28 @@
 {
+  "folders": {
+    "vQKyjuwm": {
+      "id": "vQKyjuwm",
+      "name": "Colegio EdoMex"
+    },
+    "3qtwIzN0": {
+      "id": "3qtwIzN0",
+      "name": "Colegio Yucatan"
+    }
+  },
   "qrcodes": {
-    "IyCTaC4t": {
-      "id": "IyCTaC4t",
-      "destinationUrl": "http://wa.me/5649770838",
-      "createdAt": "2025-10-20T17:10:50.498Z"
+    "0QqvTZdf": {
+      "id": "0QqvTZdf",
+      "name": "Notaría 136",
+      "destinationUrl": "http://tuqr.com.mx/notarios/137",
+      "createdAt": "2025-10-20T17:56:08.079Z",
+      "folderId": "vQKyjuwm"
     },
-    "1NA0VH2r": {
-      "id": "1NA0VH2r",
-      "destinationUrl": "https://www.facebook.com",
-      "createdAt": "2025-10-20T17:11:26.453Z"
-    },
-    "w5jN0r3A": {
-      "id": "w5jN0r3A",
-      "destinationUrl": "https://www.facebook.com/",
-      "createdAt": "2025-10-20T17:14:06.580Z"
+    "wgkuzqJs": {
+      "id": "wgkuzqJs",
+      "name": "136",
+      "destinationUrl": "http://tuqr.com.mx/notarios/136",
+      "createdAt": "2025-10-20T17:56:22.495Z",
+      "folderId": "3qtwIzN0"
     }
   }
 }

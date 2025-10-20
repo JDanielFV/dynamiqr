@@ -8,7 +8,7 @@ export default async function handler(
   switch (req.method) {
     case 'GET':
       try {
-        const { data, error } = await supabase.from('qrcodes').select('*');
+        const { data, error } = await supabase.from('folders').select('*');
         if (error) throw error;
         res.status(200).json(data);
       } catch (error: any) {
@@ -18,25 +18,15 @@ export default async function handler(
 
     case 'POST':
       try {
-        // Convertir los datos a snake_case para Supabase
-        const { destinationUrl, name, folderId } = req.body;
-        const { nanoid } = await import('nanoid');
+        const { name } = req.body;
 
-        if (!destinationUrl || !name) {
-          return res.status(400).json({ message: 'destinationUrl and name are required' });
+        if (!name) {
+          return res.status(400).json({ message: 'name is required' });
         }
-
-        const shortId = nanoid(6);
-        const insertData = {
-          id: shortId,
-          name,
-          destination_url: destinationUrl,
-          folder_id: folderId || null,
-        };
-
+        
         const { data, error } = await supabase
-          .from('qrcodes')
-          .insert([insertData])
+          .from('folders')
+          .insert([{ name }])
           .select();
 
         if (error) throw error;

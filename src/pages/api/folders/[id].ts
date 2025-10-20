@@ -12,26 +12,22 @@ export default async function handler(
   }
 
   switch (req.method) {
-    case 'PUT':
+    case 'PUT': // Rename folder
       try {
-        const { destinationUrl, name, folderId } = req.body;
-
-        const updateData: { [key: string]: any } = {};
-        if (destinationUrl) updateData.destinationUrl = destinationUrl;
-        if (name) updateData.name = name;
-        if (req.body.hasOwnProperty('folderId')) {
-          updateData.folderId = folderId || null;
+        const { name } = req.body;
+        if (!name) {
+          return res.status(400).json({ message: 'name is required' });
         }
-
+        
         const { data, error } = await supabase
-          .from('qrcodes')
-          .update(updateData)
+          .from('folders')
+          .update({ name })
           .eq('id', id)
           .select();
 
         if (error) throw error;
         if (!data || data.length === 0) {
-            return res.status(404).json({ message: `QR Code with id ${id} not found` });
+          return res.status(404).json({ message: `Folder with id ${id} not found` });
         }
 
         res.status(200).json(data[0]);
@@ -40,10 +36,13 @@ export default async function handler(
       }
       break;
 
-    case 'DELETE':
+    case 'DELETE': // Delete folder
       try {
-        const { error } = await supabase.from('qrcodes').delete().eq('id', id);
+        // Supabase handles unlinking via foreign key constraints (set to null)
+        const { error } = await supabase.from('folders').delete().eq('id', id);
+
         if (error) throw error;
+
         res.status(204).end(); // No Content
       } catch (error: any) {
         res.status(500).json({ message: error.message });
