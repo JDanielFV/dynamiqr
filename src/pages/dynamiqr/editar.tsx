@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { QRCode, Folder } from '@/types';
 
@@ -8,6 +9,22 @@ const PageWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 2rem;
+  position: relative;
+`;
+
+const NavLink = styled.a`
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  background: ${({ theme }) => theme.colors.secondary};
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: bold;
+  text-decoration: none;
+  &:hover {
+    opacity: 0.9;
+  }
 `;
 
 const Title = styled.h1`
@@ -344,6 +361,9 @@ export default function EditarPage() {
 
   return (
     <PageWrapper>
+      <Link href="/dynamiqr/generar" passHref>
+        <NavLink>Generar</NavLink>
+      </Link>
       <Title>Editar Códigos QR</Title>
       <ContentWrapper>
         {sortedFolders.map(folder => (

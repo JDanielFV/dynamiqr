@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import styled from 'styled-components';
 import jsPDF from 'jspdf';
 import { QRCode as QRCodeType, Folder } from '@/types';
@@ -9,6 +10,22 @@ const PageWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   padding: 2rem;
+  position: relative;
+`;
+
+const NavLink = styled.a`
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  background: ${({ theme }) => theme.colors.secondary};
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: bold;
+  text-decoration: none;
+  &:hover {
+    opacity: 0.9;
+  }
 `;
 
 const Title = styled.h1`
@@ -245,6 +262,9 @@ export default function GenerarPage() {
 
   return (
     <PageWrapper>
+      <Link href="/dynamiqr/editar" passHref>
+        <NavLink>Editar</NavLink>
+      </Link>
       <Title>Generador de QR Dinámicos</Title>
       <Form onSubmit={handleSubmit}>
         <Input type="text" placeholder="Nombre del QR" value={name} onChange={(e) => setName(e.target.value)} required />
