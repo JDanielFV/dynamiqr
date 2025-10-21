@@ -17,10 +17,10 @@ export default async function handler(
         const { destinationUrl, name, folderId } = req.body;
 
         const updateData: { [key: string]: any } = {};
-        if (destinationUrl) updateData.destinationUrl = destinationUrl;
+        if (destinationUrl) updateData.destination_url = destinationUrl;
         if (name) updateData.name = name;
         if (req.body.hasOwnProperty('folderId')) {
-          updateData.folderId = folderId || null;
+          updateData.folder_id = folderId || null;
         }
 
         const { data, error } = await supabase

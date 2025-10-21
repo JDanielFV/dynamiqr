@@ -17,14 +17,22 @@ const NavLink = styled.a`
   position: absolute;
   top: 2rem;
   right: 2rem;
-  background: ${({ theme }) => theme.colors.secondary};
-  color: #000;
+  background: rgba(3, 218, 198, 0.2); // theme.colors.secondary
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(3, 218, 198, 0.5);
+  border-radius: 12px;
+  color: ${({ theme }) => theme.colors.text};
   padding: 0.5rem 1rem;
-  border-radius: 4px;
   font-weight: bold;
   text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
   &:hover {
-    opacity: 0.9;
+    background: rgba(3, 218, 198, 0.3);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
   }
 `;
 
@@ -86,34 +94,52 @@ const DotStyleWrapper = styled.div`
 `;
 
 const Button = styled.button`
-  padding: 0.75rem;
-  background-color: ${({ theme }) => theme.colors.primary};
-  color: #000;
+  background: rgba(187, 134, 252, 0.2); // theme.colors.primary
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); // For Safari
+  border: 1px solid rgba(187, 134, 252, 0.5);
+  border-radius: 12px;
+  color: ${({ theme }) => theme.colors.text};
+  padding: 0.75rem 1.25rem;
   font-weight: bold;
-  border: none;
-  border-radius: 4px;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    opacity: 0.9;
+    background: rgba(187, 134, 252, 0.3);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
   }
 
   &:disabled {
-    background-color: ${({ theme }) => theme.colors.border};
+    background: rgba(255, 255, 255, 0.05);
     color: ${({ theme }) => theme.colors.textSecondary};
     cursor: not-allowed;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    transform: none;
+    box-shadow: none;
+    border-color: rgba(255, 255, 255, 0.1);
   }
 `;
 
 const SecondaryButton = styled(Button)`
-    background-color: ${({ theme }) => theme.colors.textSecondary};
-    color: ${({ theme }) => theme.colors.background};
+  background: rgba(179, 179, 179, 0.2); // theme.colors.textSecondary
+  border-color: rgba(179, 179, 179, 0.5);
+  color: ${({ theme }) => theme.colors.text};
+  &:hover {
+    background: rgba(179, 179, 179, 0.3);
+  }
 `;
 
 const DownloadButton = styled(Button)`
-    background-color: ${({ theme }) => theme.colors.secondary};
+  background: rgba(3, 218, 198, 0.2); // theme.colors.secondary
+  border-color: rgba(3, 218, 198, 0.5);
+  &:hover {
+    background: rgba(3, 218, 198, 0.3);
+  }
 `;
 
 const QRResultWrapper = styled.div`
@@ -200,29 +226,16 @@ export default function GenerarPage() {
     }
   }, [generatedQR, QRCodeStylingModule]);
 
-  const handleDownloadPdf = async () => {
-    if (!qrCodeInstanceRef.current) return;
-    const svgBlob = await qrCodeInstanceRef.current.getRawData('svg');
-    if (!svgBlob) return;
-    const doc = new jsPDF();
-    // Leer el SVG como texto
-    const reader = new FileReader();
-    reader.readAsText(svgBlob);
-    reader.onloadend = () => {
-      const svgText = reader.result as string;
-      // jsPDF v2.5+ soporta SVG directamente
-      // El método addSvgAsImage puede requerir el plugin svg de jsPDF
-      // Si no tienes el plugin, puedes usar doc.addSvg(svgText, x, y, w, h)
-      // Aquí usamos addSvg
-      // @ts-ignore
-      doc.addSvg(svgText, 15, 40, 180, 180);
-      doc.save('QRCode.pdf');
-    };
-  };
+
 
   const handleCreateFolder = async () => {
     const newFolderName = window.prompt('Nombre de la nueva carpeta:');
     if (newFolderName) {
+        if (folders.some(folder => folder.name.toLowerCase() === newFolderName.toLowerCase())) {
+            alert(`Ya existe una carpeta con el nombre "${newFolderName}".`);
+            return;
+        }
+
         const res = await fetch('/api/folders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -291,7 +304,6 @@ export default function GenerarPage() {
         <QRResultWrapper>
           <div ref={qrRef} />
           <ShortUrl>URL corta: <strong>{getFullShortUrl()}</strong></ShortUrl>
-          <DownloadButton onClick={handleDownloadPdf} style={{marginTop: '1rem'}}>Descargar PDF</DownloadButton>
           <DownloadButton onClick={handleDownloadSvg} style={{marginTop: '1rem'}}>Descargar SVG</DownloadButton>
         </QRResultWrapper>
       )}
