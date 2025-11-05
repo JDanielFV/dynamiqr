@@ -1,4 +1,4 @@
-
+import { useState } from 'react';
 import styled from 'styled-components';
 import { useRouter } from 'next/router';
 
@@ -62,21 +62,54 @@ const Button = styled.button`
   }
 `;
 
+const ErrorMessage = styled.p`
+  color: red;
+  margin-top: 1rem;
+`;
+
 const LoginPage = () => {
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    // For simulation purposes, we'll just redirect to the dashboard.
-    router.push('/dashboard');
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('/users.json');
+      const users = await response.json();
+      const user = users.find(
+        (u: any) => u.email === email && u.password === password
+      );
+
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+        router.push('/dashboard');
+      } else {
+        setError('Invalid email or password');
+      }
+    } catch (err) {
+      setError('Failed to load user data. Please try again later.');
+    }
   };
 
   return (
     <PageWrapper>
       <LoginContainer>
         <Title>Iniciar Sesión</Title>
-        <Input type="text" placeholder="Usuario" />
-        <Input type="password" placeholder="Contraseña" />
+        <Input 
+          type="email" 
+          placeholder="Email" 
+          value={email} 
+          onChange={(e) => setEmail(e.target.value)} 
+        />
+        <Input 
+          type="password" 
+          placeholder="Contraseña" 
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
+        />
         <Button onClick={handleLogin}>Entrar</Button>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
       </LoginContainer>
     </PageWrapper>
   );

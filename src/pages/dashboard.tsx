@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Link from 'next/link';
 import { QRCode, Folder } from '@/types';
+import withAuth from '@/components/withAuth';
 
 const PageWrapper = styled.div`
   padding: 2rem;
@@ -102,13 +103,24 @@ const Dashboard = () => {
   const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
     const fetchData = async () => {
       setIsLoading(true);
+      const headers = {
+        'x-user-id': user?.id || '',
+        'x-user-role': user?.role || '',
+      };
+
       const [qrRes, foldersRes] = await Promise.all([
-        fetch('/api/qr'),
-        fetch('/api/folders'),
+        fetch('/api/qr', { headers }),
+        fetch('/api/folders', { headers }),
       ]);
       const [qrData, foldersData] = await Promise.all([
         qrRes.json(),
@@ -128,8 +140,10 @@ const Dashboard = () => {
       setIsLoading(false);
     };
 
-    fetchData();
-  }, []);
+    if (user) { // Only fetch data if user is loaded
+      fetchData();
+    }
+  }, [user]); // Re-run effect when user changes
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -143,7 +157,11 @@ const Dashboard = () => {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
-  if (isLoading) {
+  const totalQRs = qrCodes.length;
+  const packageLimit = user?.role === 'admin' ? 'Unlimited' : 100; // Simulated limit
+  const remainingQRs = user?.role === 'admin' ? 'N/A' : (packageLimit as number) - totalQRs;
+
+  if (isLoading || !user) {
     return <PageWrapper><Title>Cargando Dashboard...</Title></PageWrapper>;
   }
 
@@ -152,7 +170,7 @@ const Dashboard = () => {
       <Title>Dashboard</Title>
       <StatsGrid>
         <StatCard>
-          <StatValue>{qrCodes.length}</StatValue>
+          <StatValue>{totalQRs}</StatValue>
           <StatLabel>Total de Códigos QR</StatLabel>
         </StatCard>
         <StatCard>
@@ -160,12 +178,12 @@ const Dashboard = () => {
           <StatLabel>Total de Carpetas</StatLabel>
         </StatCard>
         <StatCard>
-          <StatValue>15</StatValue>
+          <StatValue>{totalQRs}</StatValue>
           <StatLabel>QRs Activos</StatLabel>
         </StatCard>
         <StatCard>
-          <StatValue>85</StatValue>
-          <StatLabel>QRs Restantes del Paquete</StatLabel>
+          <StatValue>{remainingQRs}</StatValue>
+          <StatLabel>QRs Restantes del Paquete ({packageLimit})</StatLabel>
         </StatCard>
       </StatsGrid>
 
@@ -181,9 +199,12 @@ const Dashboard = () => {
       <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
         <Link href="/dynamiqr/generar"><Button>Generar</Button></Link>
         <Link href="/dynamiqr/editar"><Button>Editar</Button></Link>
+        {user && user.role === 'admin' && (
+          <Link href="/manage-users"><Button>Gestionar Usuarios</Button></Link>
+        )}
       </div>
     </PageWrapper>
   );
 };
 
-export default Dashboard;
+export default withAuth(Dashboard, ['admin', 'user']);

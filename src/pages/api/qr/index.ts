@@ -1,14 +1,29 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { supabase } from '@/lib/supabaseClient';
+import { nanoid } from 'nanoid';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
+  const userId = req.headers['x-user-id'] as string;
+  const userRole = req.headers['x-user-role'] as string;
+
+  if (!userId) {
+    return res.status(401).json({ message: 'Unauthorized: User ID missing' });
+  }
+
   switch (req.method) {
     case 'GET':
       try {
-        const { data, error } = await supabase.from('qrcodes').select('*');
+        let query = supabase.from('qrcodes').select('*').is('deleted_at', null);
+
+        if (userRole !== 'admin') {
+          query = query.eq('user_id', userId);
+        }
+
+        const { data, error } = await query;
+
         if (error) throw error;
         res.status(200).json(data);
       } catch (error: any) {
@@ -18,9 +33,7 @@ export default async function handler(
 
     case 'POST':
       try {
-        // Convertir los datos a snake_case para Supabase
         const { destinationUrl, name, folderId } = req.body;
-        const { nanoid } = await import('nanoid');
 
         if (!destinationUrl || !name) {
           return res.status(400).json({ message: 'destinationUrl and name are required' });
@@ -32,6 +45,7 @@ export default async function handler(
           name,
           destination_url: destinationUrl,
           folder_id: folderId || null,
+          user_id: userId, // Associate QR with the user
         };
 
         const { data, error } = await supabase

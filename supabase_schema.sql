@@ -12,5 +12,7 @@ CREATE TABLE qrcodes (
     name TEXT NOT NULL,
     destination_url TEXT NOT NULL,
     folder_id UUID REFERENCES folders(id) ON DELETE SET NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    deleted_at TIMESTAMP WITH TIME ZONE DEFAULT NULL,
+    user_id TEXT NOT NULL
 );
