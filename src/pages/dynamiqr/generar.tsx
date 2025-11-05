@@ -275,9 +275,7 @@ export default function GenerarPage() {
 
   return (
     <PageWrapper>
-      <Link href="/dynamiqr/editar" passHref>
-        <NavLink>Editar</NavLink>
-      </Link>
+
       <Title>Generador de QR Dinámicos</Title>
       <Form onSubmit={handleSubmit}>
         <Input type="text" placeholder="Nombre del QR" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -307,6 +305,10 @@ export default function GenerarPage() {
           <DownloadButton onClick={handleDownloadSvg} style={{marginTop: '1rem'}}>Descargar SVG</DownloadButton>
         </QRResultWrapper>
       )}
+      <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+        <Link href="/dynamiqr/editar"><Button>Editar</Button></Link>
+        <Link href="/dashboard"><Button>Dashboard</Button></Link>
+      </div>
     </PageWrapper>
   );
 }

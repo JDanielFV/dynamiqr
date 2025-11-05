@@ -1,9 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  compiler: {
-    styledComponents: true,
-  },
+  output: 'standalone',
+
   // ⬇️ AÑADE ESTE BLOQUE ⬇️
   typescript: {
     // Esto permite que el build se complete aunque haya errores de tipo.

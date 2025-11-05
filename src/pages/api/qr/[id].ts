@@ -14,7 +14,7 @@ export default async function handler(
   switch (req.method) {
     case 'PUT':
       try {
-        const { destinationUrl, name, folderId } = req.body;
+        const { destinationUrl, name, folderId, nfcLink } = req.body;
 
         const updateData: { [key: string]: any } = {};
         if (destinationUrl) updateData.destination_url = destinationUrl;
@@ -22,6 +22,7 @@ export default async function handler(
         if (req.body.hasOwnProperty('folderId')) {
           updateData.folder_id = folderId || null;
         }
+        if (nfcLink) updateData.nfc_link = nfcLink;
 
         const { data, error } = await supabase
           .from('qrcodes')

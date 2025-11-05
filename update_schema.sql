@@ -1,0 +1,3 @@
+ALTER TABLE folders ADD COLUMN parent_id UUID REFERENCES folders(id) ON DELETE CASCADE;
+
+ALTER TABLE qrcodes ADD COLUMN nfc_link TEXT;
